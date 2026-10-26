@@ -1,3 +1,15 @@
+# Versión 2 — Agencia Conocoto
+
+**Nota para actualizar un repositorio existente:** lee primero [`ACTUALIZACION_DESDE_GITHUB.md`](ACTUALIZACION_DESDE_GITHUB.md). El ZIP de actualización conserva tu `config.js`. No subas el Excel de pendientes a GitHub.
+
+**Filtro obligatorio de trabajo interno:** DC01, CADE, RC01 y EMER quedan fuera de la importación y de todas las vistas. El archivo del 25/10/2026 contiene 4.604 registros; 3.390 excluidos y 1.214 incluidos. Estas cifras son del corte analizado, no un indicador en vivo.
+
+**Nuevas vistas:** `Clases y actividades PM` (campo `Desc.Act.PM`) y `Planificación por calles` (agrupación textual por `Distrito` y `Calle`, no geográfica). Ahora el formulario de gestión registra fechas reales de inicio/fin, fecha planificada y grupo de recorrido; también se muestran `Status usuario`, `Status sistema`, `Pto.tbjo.resp.`, fechas límite SAP y prioridad de origen.
+
+Si conectas Supabase: ejecuta **`sql/01_esquema_supabase.sql` y luego `sql/03_migracion_v2.sql`** en instalaciones nuevas; en las existentes ejecuta **solo** `sql/03_migracion_v2.sql` antes de actualizar el código. Mantén autorización institucional para el uso de servicios externos.
+
+---
+
 # Agencia Conocoto — Control Operativo de Órdenes
 
 Aplicación web adaptable a **iPad, celular y PC**. Su código se publica con **GitHub Pages** y su información operativa se guarda de forma privada en **Supabase** (base PostgreSQL con autenticación y Row Level Security).
