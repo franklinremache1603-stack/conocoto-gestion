@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#081426" />
+  <meta name="description" content="Control y seguimiento de órdenes de trabajo — Agencia Conocoto." />
+  <title>Conocoto | Control Operativo</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo"><div class="mark">C<span>+</span></div><div><b>CONOCOTO</b><small>Control operativo</small></div></div>
+    <div class="aside-label">CENTRO DE CONTROL</div>
+    <nav aria-label="Navegación principal">
+      <button class="nav-link active" data-page="dashboard">▦ <span>Resumen ejecutivo</span></button>
+      <button class="nav-link" data-page="orders">☷ <span>Órdenes de trabajo</span></button>
+      <button class="nav-link" data-page="imports">↥ <span>Carga de Excel</span></button>
+      <button class="nav-link" data-page="history">▥ <span>Historial de cortes</span></button>
+    </nav>
+    <div class="sidebar-foot"><div class="dot-line"><span class="dot" id="mode-dot"></span><span id="mode-label">Modo local</span></div><small>Agencia Conocoto · EEQ<br>Herramienta operativa no oficial</small></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <div class="top-left"><button id="menu-toggle" class="icon-button" title="Menú" aria-label="Abrir menú">☰</button><div><div class="eyebrow">GESTIÓN COMERCIAL · ZONA PERIFÉRICA</div><h1 id="page-title">Resumen de pendientes</h1></div></div>
+      <div class="top-actions"><span class="date-pill" id="cutoff-label">Sin corte cargado</span><button id="refresh-btn" class="ghost-btn" title="Volver a cargar">⟳ Actualizar</button><button id="user-btn" class="profile-btn" title="Sesión">FR</button></div>
+    </header>
+    <main>
+      <div id="notice" class="notice hidden" role="status"></div>
+      <section id="demo-warning" class="demo-warning"><div>⚑ <strong>Modo de prueba local.</strong> Los datos solo se guardan en este navegador. Para sincronizar entre iPad y PC, configura Supabase siguiendo el README.</div><button id="open-config">Ver configuración</button></section>
+      <section class="page" id="page-dashboard">
+        <div class="section-heading"><div><p class="eyebrow">PANORAMA GENERAL</p><h2>Estado de órdenes pendientes</h2><p class="muted">Indicadores basados en el último Excel cargado y en la gestión registrada.</p></div><button class="primary-btn" id="quick-upload">＋ Cargar Excel del día</button></div>
+        <div class="stats-grid">
+          <article class="stat"><div class="stat-label">Órdenes en último corte <span class="mini-icon">▦</span></div><div class="stat-value" id="kpi-total">—</div><div class="stat-desc">Registros del reporte más reciente</div></article>
+          <article class="stat"><div class="stat-label">Pendientes de gestión <span class="mini-icon orange">◷</span></div><div class="stat-value" id="kpi-pending">—</div><div class="stat-desc">Sin registrar como atendidas</div></article>
+          <article class="stat"><div class="stat-label">En gestión <span class="mini-icon blue">↗</span></div><div class="stat-value" id="kpi-progress">—</div><div class="stat-desc">Con intervención en curso</div></article>
+          <article class="stat"><div class="stat-label">Atendidas registradas <span class="mini-icon green">✓</span></div><div class="stat-value" id="kpi-done">—</div><div class="stat-desc">En el último corte</div></article>
+        </div>
+        <div class="insight-strip"><div><span class="insight-dot"></span><strong id="kpi-new">—</strong> nuevas respecto al corte anterior</div><div><span class="insight-dot warn"></span><strong id="kpi-missing">—</strong> ya no aparecen en el último Excel</div><div><span class="insight-dot danger"></span><strong id="kpi-old">—</strong> pendientes de más de 15 días</div></div>
+        <div class="dash-grid">
+          <section class="panel"><div class="panel-heading"><div><h3>Pendientes por clase de orden</h3><p class="muted small">Distribución del corte vigente</p></div><span class="panel-tag">CLASE OT</span></div><div id="class-chart" class="bars"><div class="empty-mini">Carga tu primer Excel para ver el gráfico.</div></div></section>
+          <section class="panel"><div class="panel-heading"><div><h3>Prioridades de atención</h3><p class="muted small">Según antigüedad del pendiente</p></div><span class="panel-tag">DÍAS</span></div><div id="age-chart" class="age-list"></div><div class="hint">La antigüedad se calcula desde la fecha de creación de la orden; si no existe, desde el primer corte registrado.</div></section>
+        </div>
+        <section class="panel latest-panel"><div class="panel-heading"><div><h3>Órdenes que requieren seguimiento</h3><p class="muted small">Las más antiguas del último corte sin marcar como atendidas</p></div><button id="see-all" class="text-btn">Ver todas →</button></div><div id="priority-table"></div></section>
+      </section>
+      <section class="page hidden" id="page-orders">
+        <div class="section-heading"><div><p class="eyebrow">GESTIÓN DIARIA</p><h2>Seguimiento de órdenes</h2><p class="muted">Actualiza el estado, responsable, observación y fecha compromiso.</p></div><button id="export-btn" class="outline-btn">⇩ Exportar vista Excel</button></div>
+        <div class="filters"><div class="searchbox"><span>⌕</span><input type="search" id="search" placeholder="Buscar OT, cuenta, sector, descripción…" /></div><select id="filter-scope"><option value="current">Último corte</option><option value="missing">No aparecen en último corte</option><option value="all">Histórico completo</option></select><select id="filter-class"><option value="">Todas las clases</option></select><select id="filter-status"><option value="">Todos los estados</option><option value="PENDIENTE">Pendiente</option><option value="EN_GESTION">En gestión</option><option value="ATENDIDA">Atendida</option><option value="NO_EJECUTADA">No ejecutada</option></select></div>
+        <div class="panel table-panel"><div class="table-head"><span id="orders-count">0 órdenes</span><span class="muted small">Selecciona «Gestionar» para actualizar</span></div><div id="orders-table"></div><div class="pagination"><button class="outline-btn" id="prev-page">Anterior</button><span id="pagination-label">Página 1</span><button class="outline-btn" id="next-page">Siguiente</button></div></div>
+      </section>
+      <section class="page hidden" id="page-imports">
+        <div class="section-heading"><div><p class="eyebrow">ACTUALIZACIÓN DIARIA</p><h2>Importar Excel</h2><p class="muted">Un archivo por corte. El sistema reconoce las columnas y conserva tu gestión previa.</p></div></div>
+        <div class="upload-layout"><section class="panel upload-card"><div class="upload-icon">↥</div><h3>Cargar el reporte del día</h3><p class="muted">Selecciona el Excel exportado de SAP o del sistema comercial. Se admiten .xlsx y .xls.</p><label class="dropzone" for="excel-input"><span>☁</span><strong>Seleccionar archivo Excel</strong><small>Toca aquí desde el iPad o selecciona desde tu PC</small></label><input id="excel-input" type="file" accept=".xlsx,.xls" hidden /><div class="form-row"><label for="cut-date">Fecha del corte</label><input type="date" id="cut-date" /></div><p class="hint">No subas datos personales al repositorio de GitHub. En modo conectado las órdenes normalizadas se guardan en Supabase con acceso restringido.</p></section><section class="panel upload-info"><h3>¿Qué ocurre al importar?</h3><div class="step"><b>01</b><div><strong>Detectamos las columnas</strong><p>Se identifica el número de orden, clase, fecha, sector y demás campos disponibles.</p></div></div><div class="step"><b>02</b><div><strong>Conservamos el seguimiento</strong><p>El estado, responsable y observaciones no se borran al importar una orden ya existente.</p></div></div><div class="step"><b>03</b><div><strong>Comparamos los cortes</strong><p>Se identifican órdenes nuevas y las que dejaron de aparecer en el Excel.</p></div></div><div class="step"><b>04</b><div><strong>Actualizamos el panel</strong><p>El dashboard muestra el nuevo corte, las alertas y el historial.</p></div></div></section></div>
+        <section class="panel hidden" id="preview-panel"><div class="panel-heading"><div><h3 id="preview-title">Vista previa</h3><p class="muted small" id="preview-caption"></p></div><button class="outline-btn" id="cancel-preview">Cancelar</button></div><div class="mapping" id="column-mapping"></div><div id="preview-table"></div><div class="preview-footer"><span id="preview-validation" class="muted small"></span><button id="confirm-import" class="primary-btn">Confirmar importación</button></div></section>
+      </section>
+      <section class="page hidden" id="page-history"><div class="section-heading"><div><p class="eyebrow">TRAZABILIDAD</p><h2>Historial de cortes diarios</h2><p class="muted">Resumen de las cargas realizadas. Las ausencias no se interpretan automáticamente como órdenes finalizadas.</p></div></div><section class="panel"><div class="panel-heading"><h3>Archivos importados</h3><span class="panel-tag" id="history-total">0 CORTES</span></div><div id="history-table"></div></section></section>
+    </main>
+    <footer>Agencia Conocoto · Sistema de seguimiento operativo · <span id="footer-year">2026</span></footer>
+  </div>
+</div>
+<div class="modal-backdrop hidden" id="modal-backdrop" role="presentation"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-head"><div><p class="eyebrow">ACTUALIZACIÓN DE ORDEN</p><h2 id="modal-title">Gestionar orden</h2></div><button id="close-modal" class="icon-button" aria-label="Cerrar">✕</button></div><div id="modal-order-details" class="detail-grid"></div><form id="edit-form"><div class="form-row"><label for="edit-status">Estado de gestión</label><select id="edit-status" required><option value="PENDIENTE">Pendiente</option><option value="EN_GESTION">En gestión</option><option value="ATENDIDA">Atendida</option><option value="NO_EJECUTADA">No ejecutada</option></select></div><div class="two-inputs"><div class="form-row"><label for="edit-assignee">Responsable</label><input id="edit-assignee" maxlength="120" placeholder="Técnico o equipo" /></div><div class="form-row"><label for="edit-due">Fecha compromiso</label><input id="edit-due" type="date" /></div></div><div class="form-row"><label for="edit-notes">Observaciones / próxima acción</label><textarea id="edit-notes" rows="4" maxlength="5000" placeholder="Ej.: Pendiente visita, material, coordinación, gestión realizada…"></textarea></div><div class="modal-actions"><button class="outline-btn" type="button" id="cancel-modal">Cancelar</button><button class="primary-btn" type="submit" id="save-order">Guardar cambios</button></div></form><details class="audit-box"><summary>Historial de gestiones de esta orden</summary><div id="modal-logs" class="log-list"></div></details></div></div>
+<div class="modal-backdrop hidden" id="auth-backdrop"><div class="modal auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title"><div class="auth-brand">C<span>+</span></div><h2 id="auth-title">Acceso al control operativo</h2><p class="muted">Inicia sesión con la cuenta autorizada en Supabase.</p><form id="auth-form"><div class="form-row"><label for="auth-email">Correo electrónico</label><input type="email" id="auth-email" required autocomplete="username" /></div><div class="form-row"><label for="auth-password">Contraseña</label><input type="password" id="auth-password" required autocomplete="current-password" /></div><button class="primary-btn wide" type="submit" id="login-btn">Iniciar sesión</button></form><p class="hint">El administrador debe dar de alta y autorizar a cada usuario. La aplicación no admite registro público.</p></div></div>
+<script src="config.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
